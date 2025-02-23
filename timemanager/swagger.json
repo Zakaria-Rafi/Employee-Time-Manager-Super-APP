@@ -1,0 +1,3700 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "version": "0.0.1",
+        "title": "TimeManager API"
+    },
+    "host": "localhost:4000",
+    "servers": [
+        {
+          "url": "http://localhost:4000"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "in": "header",
+                "bearerFormat": "JWT",
+                "name": "Authorization"
+            },
+            "csrfToken": {
+                "type": "apiKey",
+                "scheme": "bearer",
+                "in": "header",
+                "name": "X-CSRF-TOKEN"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Route to manage authentication"
+        },
+        {
+            "name": "User",
+            "description": "Route to manage user"
+        },
+        {
+            "name": "Working Time",
+            "description": "Route to manage working time"
+        },
+        {
+            "name": "Clocking",
+            "description": "Route to manage clocking"
+        },
+        {
+            "name": "Teams",
+            "description": "Route to manage team"
+        }
+    ],
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Login user",
+                "produces": ["application/json"],
+                "security": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["email", "password"],
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "employee@epitech.eu"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "azertyuiop"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "SFMyNTY.g2gDdAAAAAF3B3VzZXJfaWRhA24GALHcbY-SAWIAAVGA.ppyVvO_h_0JPa0GwFLMNwEcTe7jDVCIfpU_yuCJNR1I"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.required_email_and_password"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If email or passwird is not founded": {
+                                        "value": {
+                                            "message": "auth.required_email_and_password"
+                                        }
+                                    },
+                                    "If email is empty": {
+                                        "value": {
+                                            "message": "auth.form.empty_email"
+                                        }
+                                    },
+                                    "If password is empty": {
+                                        "value": {
+                                            "message": "auth.form.empty_password"
+                                        }
+                                    },
+                                    "If credentials are invalid": {
+                                        "value": {
+                                            "message": "auth.invalid_credentials"
+                                        }
+                                    },
+                                    "If token generation is not possible": {
+                                        "value": {
+                                            "message": "auth.token_error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "delete": {
+                "tags": ["Authentication"],
+                "summary": "Logout user",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "user.logged_out"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": ["User"],
+                "summary": "Get user by email and username",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "type": "string",
+                        "format": "email",
+                        "required": false
+                    },
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "type": "string",
+                        "format": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/UsersResponse"
+                                },
+                                "examples": {
+                                    "If username and email is not found": {
+                                        "$ref": "#/definitions/UsersResponse"
+                                    },
+                                    "If username and email is found": {
+                                        "$ref": "#/definitions/UserResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.empty_username_and_email"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If username and email is empty": {
+                                        "value": {
+                                            "message": "user.empty_username_and_email"
+                                        }
+                                    },
+                                    "If username and email is not found": {
+                                        "value": {
+                                            "message": "user.required_username_and_email"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["User"],
+                "summary": "Create user",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["username", "email", "password"],
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "example": "employee"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "employee@epitech.eu"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "azertyuiop"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.form.empty_username"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If username is empty": {
+                                        "value": {
+                                            "message": "user.form.empty_username"
+                                        }
+                                    },
+                                    "If email is empty": {
+                                        "value": {
+                                            "message": "user.form.empty_email"
+                                        }
+                                    },
+                                    "If email is not valid": {
+                                        "value": {
+                                            "message": "user.form.invalid_email"
+                                        }
+                                    },
+                                    "If password is empty": {
+                                        "value": {
+                                            "message": "user.form.empty_password"
+                                        }
+                                    },
+                                    "If a user cannot be created": {
+                                        "value": {
+                                            "message": "user.creation_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/me": {
+            "get": {
+                "tags": ["User"],
+                "summary": "Get user details",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{userId}": {
+            "get": {
+                "tags": ["User"],
+                "summary": "Get user by id",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["User"],
+                "summary": "Update user",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["username", "email"],
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "example": "employee"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "employee@epitech.eu"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.form.empty_username"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If username is empty": {
+                                        "value": {
+                                            "message": "user.form.empty_username"
+                                        }
+                                    },
+                                    "If email is empty": {
+                                        "value": {
+                                            "message": "user.form.empty_email"
+                                        }
+                                    },
+                                    "If email is not valid": {
+                                        "value": {
+                                            "message": "user.form.invalid_email"
+                                        }
+                                    },
+                                    "If a user cannot be updated": {
+                                        "value": {
+                                            "message": "user.update_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["User"],
+                "summary": "Delete user",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.cannot_delete_self"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{userId}/teams": {
+            "get": {
+                "tags": ["User"],
+                "summary": "Get all teams by user id",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/UserTeamsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{userId}/promote": {
+            "put": {
+                "tags": ["User"],
+                "summary": "Promote user",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["role"],
+                                "type": "object",
+                                "properties": {
+                                    "role": {
+                                        "type": "string",
+                                        "description": "ROLE_MANAGER or ROLE_SUPERMANAGER",
+                                        "example": "ROLE_MANAGER"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.cannot_promote_self"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.form.empty_role"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If role is empty": {
+                                        "value": {
+                                            "message": "user.form.empty_role"
+                                        }
+                                    },
+                                    "If role is not valid": {
+                                        "value": {
+                                            "message": "user.form.invalid_role"
+                                        }
+                                    },
+                                    "If role already exist to user": {
+                                        "value": {
+                                            "message": "user.role_already_exists"
+                                        }
+                                    },
+                                    "If a user cannot be promoted": {
+                                        "value": {
+                                            "message": "user.promote_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{userId}/demote": {
+            "put": {
+                "tags": ["User"],
+                "summary": "Promote user",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["role"],
+                                "type": "object",
+                                "properties": {
+                                    "role": {
+                                        "type": "string",
+                                        "description": "ROLE_MANAGER or ROLE_SUPERMANAGER",
+                                        "example": "ROLE_MANAGER"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.cannot_demote_self"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.form.empty_role"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If role is empty": {
+                                        "value": {
+                                            "message": "user.form.empty_role"
+                                        }
+                                    },
+                                    "If role is not valid": {
+                                        "value": {
+                                            "message": "user.form.invalid_role"
+                                        }
+                                    },
+                                    "If role not exist to user": {
+                                        "value": {
+                                            "message": "user.role_not_found"
+                                        }
+                                    },
+                                    "If a user cannot be demoted": {
+                                        "value": {
+                                            "message": "user.demote_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/workingtime/{userId}": {
+            "get": {
+                "tags": ["Working Time"],
+                "summary": "Get all working time by user id and date range",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "type": "integer",
+                        "format": "number",
+                        "required": false
+                    },
+                    {
+                        "name": "page_size",
+                        "in": "query",
+                        "type": "integer",
+                        "format": "number",
+                        "required": false
+                    },
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": false
+                    },
+                    {
+                        "name": "end",
+                        "in": "query",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/WorkingTimesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "working_time.required_start_and_end"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If start or end is not setted": {
+                                        "value": {
+                                            "message": "working_time.required_start_and_end"
+                                        }
+                                    },
+                                    "If start or end is empty": {
+                                        "value": {
+                                            "message": "working_time.empty_start_and_end"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If user is not found": {
+                                        "value": {
+                                            "message": "user.not_found"
+                                        }
+                                    },
+                                    "If working time founded": {
+                                        "value": {
+                                            "message": "working_time.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Working Time"],
+                "summary": "Create working time",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["start", "end"],
+                                "type": "object",
+                                "properties": {
+                                    "start": {
+                                        "summary": "Date-time converted in timestamp",
+                                        "type": "string"
+                                    },
+                                    "end": {
+                                        "summary": "Date-time converted in timestamp",
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/WorkingTimeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "working_time.required_start_and_end"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If start or end is not setted": {
+                                        "value": {
+                                            "message": "working_time.required_start_and_end"
+                                        }
+                                    },
+                                    "If start or end is empty": {
+                                        "value": {
+                                            "message": "working_time.empty_start_and_end"
+                                        }
+                                    },
+                                    "If a working time cannot be created": {
+                                        "value": {
+                                            "message": "working_time.creation_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/workingtime/{userId}/clocks": {
+            "get": {
+                "tags": ["Working Time"],
+                "summary": "Get all working time + clocks by user id and date range",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": false
+                    },
+                    {
+                        "name": "end",
+                        "in": "query",
+                        "type": "string",
+                        "format": "date-time",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/WorkingTimeWithClocksResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "working_time.clock_not_found"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If no clock and working time have been found": {
+                                        "value": {
+                                            "message": "working_time.clock_not_found"
+                                        }
+                                    },
+                                    "If user not founded": {
+                                        "value": {
+                                            "message": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/workingtime/{userId}/{id}": {
+            "get": {
+                "tags": ["Working Time"],
+                "summary": "Get working time by id and user id",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/WorkingTimeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "working_time.not_found"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If working time not found": {
+                                        "value": {
+                                            "message": "working_time.not_found"
+                                        }
+                                    },
+                                    "If user not found": {
+                                        "value": {
+                                            "message": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/workingtime/{id}": {
+            "put": {
+                "tags": ["Working Time"],
+                "summary": "Update working time by id",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "start": {
+                                        "summary": "Date-time converted in timestamp",
+                                        "type": "string"
+                                    },
+                                    "end": {
+                                        "summary": "Date-time converted in timestamp",
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/WorkingTimeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "working_time.required_start_and_end"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If start or end is not setted": {
+                                        "value": {
+                                            "message": "working_time.required_start_and_end"
+                                        }
+                                    },
+                                    "If start or end is empty": {
+                                        "value": {
+                                            "message": "working_time.empty_start_and_end"
+                                        }
+                                    },
+                                    "If a working time cannot be updated": {
+                                        "value": {
+                                            "message": "working_time.update_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "working_time.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Working Time"],
+                "summary": "Delete working time by id",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "working_time.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/clocks/{userId}": {
+            "get": {
+                "tags": ["Clocking"],
+                "summary": "Get current clocking by user id",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/ClockingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If user not found": {
+                                        "value": {
+                                            "message": "user.not_found"
+                                        }
+                                    },
+                                    "If clock not found": {
+                                        "value": {
+                                            "message": "clock.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Clocking"],
+                "summary": "Create clocking",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/ClockingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/clocks/{userId}/offline": {
+            "post": {
+                "tags": ["Clocking"],
+                "summary": "Create offline clocking",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["time", "status"],
+                                "type": "object",
+                                "properties": {
+                                    "time": {
+                                        "summary": "Date-time converted in timestamp",
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/ClockingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "clock.form.empty_time"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If time is empty": {
+                                        "value": {
+                                            "message": "clock.form.empty_time"
+                                        }
+                                    },
+                                    "If status is empty": {
+                                        "value": {
+                                            "message": "clock.form.empty_status"
+                                        }
+                                    },
+                                    "If status is not boolean": {
+                                        "value": {
+                                            "message": "clock.form.invalid_status"
+                                        }
+                                    },
+                                    "If time is not valid": {
+                                        "value": {
+                                            "message": "clock.form.invalid_time"
+                                        }
+                                    },
+                                    "If a clock cannot be created": {
+                                        "value": {
+                                            "message": "clock.creation_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/clocks/{userId}/clock/{clockId}": {
+            "get": {
+                "tags": ["Clocking"],
+                "summary": "Get clocking by id",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "path",
+                        "name": "clockId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/ClockingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If user not found": {
+                                        "value": {
+                                            "message": "user.not_found"
+                                        }
+                                    },
+                                    "If clock not found": {
+                                        "value": {
+                                            "message": "clock.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["Clocking"],
+                "summary": "Update clocking by id",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "path",
+                        "name": "clockId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["time", "status"],
+                                "type": "object",
+                                "properties": {
+                                    "time": {
+                                        "summary": "Date-time converted in timestamp",
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/ClockingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If user not found": {
+                                        "value": {
+                                            "message": "user.not_found"
+                                        }
+                                    },
+                                    "If clock not found": {
+                                        "value": {
+                                            "message": "clock.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "clock.form.empty_time"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If time is empty": {
+                                        "value": {
+                                            "message": "clock.form.empty_time"
+                                        }
+                                    },
+                                    "If status is empty": {
+                                        "value": {
+                                            "message": "clock.form.empty_status"
+                                        }
+                                    },
+                                    "If status is not boolean": {
+                                        "value": {
+                                            "message": "clock.form.invalid_status"
+                                        }
+                                    },
+                                    "If time is not valid": {
+                                        "value": {
+                                            "message": "clock.form.invalid_time"
+                                        }
+                                    },
+                                    "If a clock cannot be updated": {
+                                        "value": {
+                                            "message": "clock.update_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Clocking"],
+                "summary": "Delete clocking by id",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "path",
+                        "name": "clockId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_found"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If user not found": {
+                                        "value": {
+                                            "message": "user.not_found"
+                                        }
+                                    },
+                                    "If clock not found": {
+                                        "value": {
+                                            "message": "clock.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/teams": {
+            "get": {
+                "tags": ["Teams"],
+                "summary": "Get all teams",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "type": "integer",
+                        "format": "number",
+                        "required": false
+                    },
+                    {
+                        "name": "page_size",
+                        "in": "query",
+                        "type": "integer",
+                        "format": "number",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/TeamsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Teams"],
+                "summary": "Create team",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["name"],
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/TeamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "team.form.empty_name"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If name is not setted": {
+                                        "value": {
+                                            "message": "team.form.empty_name"
+                                        }
+                                    },
+                                    "If a team cannot be created": {
+                                        "value": {
+                                            "message": "team.create_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/teams/{teamId}": {
+            "get": {
+                "tags": ["Teams"],
+                "summary": "Get team by id",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "type": "integer",
+                        "format": "number",
+                        "required": false
+                    },
+                    {
+                        "name": "page_size",
+                        "in": "query",
+                        "type": "integer",
+                        "format": "number",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/TeamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "teams.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Teams"],
+                "summary": "Delete team by id",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "teamId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "teams.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["Teams"],
+                "summary": "Update team",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["name"],
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "summary": "Date-time converted in timestamp",
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/TeamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "teams.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "team.form.empty_name"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If name is not setted": {
+                                        "value": {
+                                            "message": "team.form.empty_name"
+                                        }
+                                    },
+                                    "If a team cannot be updated": {
+                                        "value": {
+                                            "message": "team.update_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/teams/{teamId}/add/{userId}": {
+            "put": {
+                "tags": ["Teams"],
+                "summary": "Add user to team",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "teamId",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/TeamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.already_in_team"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "team.not_found"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If team not founded": {
+                                        "value": {
+                                            "message": "team.not_found"
+                                        }
+                                    },
+                                    "If user not founded": {
+                                        "value": {
+                                            "message": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "team.add_user_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/teams/{teamId}/remove/{userId}": {
+            "delete": {
+                "tags": ["Teams"],
+                "summary": "Remove user from team",
+                "produces": ["application/json"],
+                "security": [
+                    {
+                        "bearerAuth": [],
+                        "csrfToken": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "teamId",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/definitions/TeamResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "user.not_in_team"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "team.not_found"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If team not founded": {
+                                        "value": {
+                                            "message": "team.not_found"
+                                        }
+                                    },
+                                    "If user not founded": {
+                                        "value": {
+                                            "message": "user.not_found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "auth.invalid_token"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "If auth token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_token"
+                                        }
+                                    },
+                                    "If csrf token is not valid": {
+                                        "value": {
+                                            "message": "auth.invalid_csrf_token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "user.role.not_authorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "team.remove_user_failed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "UserResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "lastLogin": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                }
+            }
+        },
+        "UsersResponse": {
+            "type": "object",
+            "properties": {
+               "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UserResponse"
+                    }
+                },
+                "total_count": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "total_pages": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "current_page": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "next_page": {
+                    "type": "boolean",
+                    "format": "boolean"
+                },
+                "prev_page": {
+                    "type": "boolean",
+                    "format": "boolean"
+                } 
+            }
+        },
+        "UserTeamsResponse": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "number"
+                    },
+                    "name": {
+                        "type": "string",
+                        "format": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                }
+            }
+        },
+        "WorkingTimesResponse": {
+            "type": "object",
+            "properties": {
+               "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/WorkingTimeResponse"
+                    }
+                },
+                "started_at": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "ended_at": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "total_count": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "total_pages": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "current_page": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "next_page": {
+                    "type": "boolean",
+                    "format": "boolean"
+                },
+                "prev_page": {
+                    "type": "boolean",
+                    "format": "boolean"
+                } 
+            }
+        },
+        "WorkingTimeWithClocksResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "format": "number"
+                            },
+                            "start": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "end": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "clocks": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/ClockingResponse"
+                                }
+                            },
+                            "total_clocked_time": {
+                                "type": "integer",
+                                "format": "number"
+                            },
+                            "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "updatedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            }
+                        }
+                    }
+                },
+                "started_at": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "ended_at": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "WorkingTimeResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "start": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "end": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                },
+                "total_worked_time": {
+                    "type": "integer",
+                    "format": "number"
+                }
+            }
+        },
+        "ClockingResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "time": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "to_check": {
+                    "type": "boolean"
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "TeamsResponse": {
+            "type": "object",
+            "properties": {
+               "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TeamResponse"
+                    }
+                },
+                "total_count": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "total_pages": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "current_page": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "next_page": {
+                    "type": "boolean",
+                    "format": "boolean"
+                },
+                "prev_page": {
+                    "type": "boolean",
+                    "format": "boolean"
+                } 
+            }
+        },
+        "TeamResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "number"
+                },
+                "name": {
+                    "type": "string",
+                    "format": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UserResponse"
+                    }
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                }
+            }
+        }
+    }
+}

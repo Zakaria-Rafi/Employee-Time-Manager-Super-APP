@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=Passw0rd
+      - POSTGRES_USER=timemanager_user
+      - POSTGRES_DB=timemanager_db
+      
+  elixir:
+    image: mrvalentin2/t-poo-700-nan_6-elixir:latest
+    environment:
+      - MIX_ENV=prod
+      - SECRET_KEY_BASE=secret_key_base
+      - DATABASE_URL=ecto://timemanager_user:Passw0rd@postgres/timemanager_db
+      - JWT_PASSPHRASE=Passw0rd
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "4001:8080"
+    volumes:
+      - ./timemanager/swagger.json:/openapi.json
+    environment:
+      SWAGGER_JSON: /openapi.json
+
+  vuejs:
+    image: mrvalentin2/t-poo-700-nan_6-vuejs:latest
+    ports:
+      - "80:80"
+
+volumes:
+  postgres: {}

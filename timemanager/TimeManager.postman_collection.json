@@ -1,0 +1,1174 @@
+{
+	"info": {
+		"_postman_id": "f65d8c7c-cb28-4b48-8d10-f158b8bb6380",
+		"name": "TimeManager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28471771"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {\r",
+									"    pm.collectionVariables.set('auth_token', pm.response.json().token)\r",
+									"    pm.collectionVariables.set('csrf_token', pm.response.json().csrf_token)\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "supermanager@epitech.eu",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "azertyuiop",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/login",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "SFMyNTY.g2gDdAAAAAF3B3VzZXJfaWRhA24GAK4Huo-SAWIAAVGA.DTom9fP68DjjHIdGYD1nFW_hQRJd54q_OZOqySOnidE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "employee@epitech.eu",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "azertyuiop",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/logout",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "/users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/users",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "employee",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "employee@epitech.eu",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/users/me",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:userId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/users/:userId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:userId/teams",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/users/:userId/teams",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"teams"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{$randomUserName}}",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "{{$randomEmail}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "azertyuiop",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/users",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:userId",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "{{$randomUserName}}",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "{{$randomEmail}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "azertyuiop",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/users/:userId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:userId/promote",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "role",
+									"value": "ROLE_MANAGER",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "ROLE_SUPERMANAGER",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/users/:userId/promote",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"promote"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:userId/demote",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "role",
+									"value": "ROLE_MANAGER",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "ROLE_SUPERMANAGER",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/users/:userId/demote",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"demote"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/users/:userId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/users/:userId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Clocks",
+			"item": [
+				{
+					"name": "/clocks/:userId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/clocks/:userId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"clocks",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/clocks/:userId",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/clocks/:userId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"clocks",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/clocks/:userId/offline",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/clocks/:userId/offline?time=1729688869&status=false",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"clocks",
+								":userId",
+								"offline"
+							],
+							"query": [
+								{
+									"key": "time",
+									"value": "1729688869"
+								},
+								{
+									"key": "status",
+									"value": "false"
+								}
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/clocks/:userId/clock/:clockId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/clocks/:userId/clock/:clockId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"clocks",
+								":userId",
+								"clock",
+								":clockId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								},
+								{
+									"key": "clockId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/clocks/:userId/clock/:clockId",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "time",
+									"value": "1729688869",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/clocks/:userId/clock/:clockId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"clocks",
+								":userId",
+								"clock",
+								":clockId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								},
+								{
+									"key": "clockId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/clocks/:userId/clock/:clockId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/clocks/:userId/clock/:clockId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"clocks",
+								":userId",
+								"clock",
+								":clockId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								},
+								{
+									"key": "clockId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Working Times",
+			"item": [
+				{
+					"name": "/workingtime/:userId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/workingtime/:userId?page_size=100",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"workingtime",
+								":userId"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "1729036800",
+									"description": "In timestamp",
+									"disabled": true
+								},
+								{
+									"key": "end",
+									"value": "1729382400",
+									"description": "In timestamp",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "3",
+									"disabled": true
+								},
+								{
+									"key": "page_size",
+									"value": "100"
+								}
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/workingtime/:userId/clocks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/workingtime/:userId/clocks",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"workingtime",
+								":userId",
+								"clocks"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "1729296000",
+									"description": "In timestamp",
+									"disabled": true
+								},
+								{
+									"key": "end",
+									"value": "1729468800",
+									"description": "In timestamp",
+									"disabled": true
+								},
+								{
+									"key": "page_size",
+									"value": "100",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/workingtime/:userId/:workingTimeId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/workingtime/:userId/:workingTimeId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"workingtime",
+								":userId",
+								":workingTimeId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": ""
+								},
+								{
+									"key": "workingTimeId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/workingtime/:userId",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "start",
+									"value": "1728465840",
+									"description": "In timestamp",
+									"type": "text"
+								},
+								{
+									"key": "end",
+									"value": "1728897840",
+									"description": "In timestamp",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/workingtime/:userId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"workingtime",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/workingtime/:workingTimeId",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "start",
+									"value": "1728465841",
+									"description": "In timestamp",
+									"type": "text"
+								},
+								{
+									"key": "end",
+									"value": "1728897841",
+									"description": "In timestamp",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/workingtime/:workingTimeId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"workingtime",
+								":workingTimeId"
+							],
+							"variable": [
+								{
+									"key": "workingTimeId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/workingtime/:workingTimeId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/workingtime/:workingTimeId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"workingtime",
+								":workingTimeId"
+							],
+							"variable": [
+								{
+									"key": "workingTimeId",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Teams",
+			"item": [
+				{
+					"name": "/teams",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/teams",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"teams"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page_size",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teams/:teamId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/teams/:teamId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"teams",
+								":teamId"
+							],
+							"variable": [
+								{
+									"key": "teamId",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teams",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Team Test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/teams",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"teams"
+							],
+							"query": [
+								{
+									"key": "page_size",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teams/:teamId",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Team test {{$randomInt}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{timemanager_url}}/teams/:teamId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"teams",
+								":teamId"
+							],
+							"variable": [
+								{
+									"key": "teamId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teams/:teamId/add/:userId",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/teams/:teamId/add/:userId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"teams",
+								":teamId",
+								"add",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "teamId",
+									"value": "2"
+								},
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teams/:teamId/remove/:userId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/teams/:teamId/remove/:userId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"teams",
+								":teamId",
+								"remove",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "teamId",
+									"value": "2"
+								},
+								{
+									"key": "userId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teams/:teamId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{timemanager_url}}/teams/:teamId",
+							"host": [
+								"{{timemanager_url}}"
+							],
+							"path": [
+								"teams",
+								":teamId"
+							],
+							"variable": [
+								{
+									"key": "teamId",
+									"value": "28"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"pm.request.headers.add(pm.collectionVariables.get(\"csrf_token\"), 'x-csrf-token')"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "timemanager_url",
+			"value": "http://localhost:4000/api",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": ""
+		},
+		{
+			"key": "csrf_token",
+			"value": ""
+		}
+	]
+}

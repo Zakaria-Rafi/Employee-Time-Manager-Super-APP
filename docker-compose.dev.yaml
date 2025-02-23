@@ -1,0 +1,69 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=Passw0rd
+      - POSTGRES_USER=timemanager_user
+      - POSTGRES_DB=timemanager_db
+
+  elixir:
+    image: elixir:alpine
+    working_dir: /usr/src/app
+    command: >
+      sh -c "apk add --no-cache bash git inotify-tools curl make cmake g++ build-base &&
+        mix local.hex --force &&
+        mix local.rebar --force &&
+        mix archive.install hex phx_new --force &&
+        mix do deps.get, deps.compile &&
+        mix ecto.migrate --log-migrator-sql &&
+        mix run priv/repo/seeds.exs &&
+        mix phx.server"
+    volumes:
+      - ./timemanager:/usr/src/app
+    environment:
+      - MIX_ENV=dev
+      - DATABASE_HOST=postgres
+      - DATABASE_USER=timemanager_user
+      - DATABASE_PASSWORD=Passw0rd
+      - DATABASE_NAME=timemanager_db
+      - JWT_PASSPHRASE=Passw0rd
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "4001:8080"
+    volumes:
+      - ./timemanager/swagger.json:/openapi.json
+    environment:
+      SWAGGER_JSON: /openapi.json
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "4002:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+  vuejs:
+    image: node:lts-alpine
+    working_dir: /usr/share/app
+    command: "sh -c 'npm install -g npm@latest && npm install --loglevel silly && npm run dev'"
+    volumes:
+      - ./app:/usr/share/app
+    ports:
+      - "5173:5173"
+
+volumes:
+  pgadmin-data: {}
+  postgres: {}
